@@ -1,0 +1,8 @@
+Some example conversations // feature ideas
+
+"I'm putting my keys in the drawer"
+	"Okay, got it"
+	- entity:"my keys", location:"the drawer", action:"put"
+	-> action: store "My keys"-{in-location}->"the drawer"
+
+""
