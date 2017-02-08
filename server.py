@@ -3,9 +3,9 @@ logging.basicConfig(level='INFO')
 log = logging.Logger(__name__)
 
 from flask import Flask, request
-from intent_classifier.model import Model
+from intent_classifier.main import IntentClassifier
 
-m = Model()
+m = IntentClassifier()
 server = Flask(__name__)
 
 @server.route("/", methods=['POST'])

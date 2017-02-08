@@ -91,9 +91,9 @@ def gen_weather(output):
 	output('weather')
 
 if __name__ == "__main__":
-	with open('weather.txt', 'w') as f:
+	with open('training_data/add_calendar.txt', 'w') as f:
 		output = lambda s: f.write(s + '\n')
-		gen_weather(output)
+		gen_add_to_calendar(output)
 
 
 			

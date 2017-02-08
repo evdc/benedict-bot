@@ -1,8 +1,8 @@
 import spacy
 import json
 
-import logging
-log = logging.Logger(__name__)
+from models.simple_lstm import SimpleLSTM
+from modeler import Modeler
 
 # The ENTITY RECOGNIZER will be easily the most important component of this system.
 # spaCy's built in NER is not great, but NP extraction is a decent place to start.
@@ -11,11 +11,12 @@ log = logging.Logger(__name__)
 
 # Vector based: see https://explosion.ai/blog/deep-learning-formula-nlp
 
-class Model(object):
+class IntentClassifier(object):
     def __init__(self):
-        log.info("Loading spaCy ...")
-        self.nlp = spacy.load('en')
-        log.info("Loaded spaCy")
+        # print "Loading spaCy ..."
+        # self.nlp = spacy.load('en')
+        # print "Loaded spaCy"
+        self.modeler = Modeler(SimpleLSTM)
         self.history = []
         self.context = {}
 
@@ -29,9 +30,12 @@ class Model(object):
             and internal context (internal representation of state of the world).
             Return JSON of {action: string, action_data: string, response: string} '''
 
-        doc = self.nlp(unicode(message))
-        res = []
-        for np in doc.noun_chunks:  # first pass
-            res.append(np.text + ':' + np.ent_id_)
-        return {'action': 'RESPOND', 'action_data': {}, 'response': str(res)}
+        label = self.modeler([message])[0]
+        return {'action': label}
+
+        # doc = self.nlp(unicode(message))
+        # res = []
+        # for np in doc.noun_chunks:  # first pass
+        #     res.append(np.text + ':' + np.ent_id_)
+        # return {'action': 'RESPOND', 'action_data': {}, 'response': str(res)}
 
