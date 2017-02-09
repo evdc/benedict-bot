@@ -1,7 +1,8 @@
 import spacy
 import json
 
-from models.simple_lstm import SimpleLSTM
+#from models.simple_lstm import SimpleLSTM
+from models.spacy_lstm import SpacyLSTM
 from modeler import Modeler
 
 # The ENTITY RECOGNIZER will be easily the most important component of this system.
@@ -13,15 +14,14 @@ from modeler import Modeler
 
 class IntentClassifier(object):
     def __init__(self):
-        # print "Loading spaCy ..."
-        # self.nlp = spacy.load('en')
-        # print "Loaded spaCy"
-        self.modeler = Modeler(SimpleLSTM)
+        print "Loading spaCy ..."
+        self.nlp = spacy.load('en')
+        print "Loaded spaCy"
+        self.modeler = Modeler(SpacyLSTM, vocab=self.nlp.vocab)
         self.history = []
         self.context = {}
 
     def __call__(self, message, context):
-        print "History", str(self.history)
         self.history.append(message)
         return self.parse_intent(message, context)
 

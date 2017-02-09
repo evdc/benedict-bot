@@ -2,22 +2,30 @@ import numpy as np
 import os
 from sklearn.metrics import classification_report
 from keras.utils import np_utils
+import spacy
 import glob
+import json
 
 from models.simple_lstm import SimpleLSTM
+from models.spacy_lstm import SpacyLSTM
 
-# Framework for training, evaluating, loading, saving and using models
-# By default, on init will load a pretrained version of the given model class,
-# or if there isn't one will train and save one; this can be prevented by passing initialize=False to constructor.
-# On call, predict a vector of samples (so to predict one sample, use modeler([x])[0] )
-# This framework can be used by any model that supports the following methods:
-#	train, predict, save, load
+''' Framework for training, evaluating, loading, saving and using models
+	By default, on init will load a pretrained version of the given model class,
+	or if there isn't one will train and save one; this can be prevented by passing initialize=False to constructor.
+	On call, predict a vector of samples (so to predict one sample, use modeler([x])[0] )
+	This framework can be used by any model that supports the following methods:
+		train, predict, save, load 
+	Kwargs given to constructor of the Modeler will be passed on to constructor of the model
+'''
 
 def from_categorical(Y):
     return np.nonzero(Y)[1]
 
+# TODO maybe actually refactor this so we don't (re)train - this class just exposes model for prediction?
+
 class Modeler(object):
-	def __init__(self, model_class=None, model_directory='models', training_directory='training_data'):
+	def __init__(self, model_class=None, retrain=False,
+			model_directory='models', training_directory='training_data', **kwargs):
 		self.labels = []
 		self.n_categories = 0
 		self.model_class = None
@@ -27,33 +35,38 @@ class Modeler(object):
 
 		if model_class:
 			self.model_class = model_class
-			self.load_or_train(model_class, self.model_directory, self.training_directory)
+			self.initialize(model_class, self.model_directory, self.training_directory, retrain=retrain, **kwargs)
 
-	def load_or_train(self, model_class, model_directory, training_directory):
+	def initialize(self, model_class, model_directory, training_directory, retrain=False, **kwargs):
+		'''Try to load a pretrained model, or if none is found, train one.'''
 		name = model_class.__name__
 		model_path = model_directory + '/' + name + '.h5'
-		if os.path.exists(model_path):
+		if os.path.exists(model_path) and not retrain:
 			print "Loading " + model_path
-			self.load(model_class)
+			self.load(model_class, **kwargs)
 		else:
-			print "No existing model found. Training new one"
-			self.build_and_save(model_class, training_directory)
+			print "Training new model ..."
+			self.build(model_class, training_directory, **kwargs)
 		assert self.model
 
-	def load(self, model_class):
-		self.model = model_class()
+	def load(self, model_class, **kwargs):
+		self.model = model_class(**kwargs)
 		model_name = self.model.__class__.__name__
 		self.model.load(self.model_directory + '/' + model_name + '.h5')
+		with open(self.model_directory + '/' + model_name + '.labels.json', 'r') as f:
+			self.labels = json.loads(f.read())
 
 	def save(self):
 		model_name = self.model.__class__.__name__
-		self.model.load(self.model_directory + '/' + model_name + '.h5')
+		self.model.save(self.model_directory + '/' + model_name + '.h5')
+		with open(self.model_directory + '/' + model_name + '.labels.json', 'w') as f:
+			f.write(json.dumps(self.labels))
 
-	def build_and_save(self, model_class, training_directory):
+	def build(self, model_class, training_directory, **kwargs):
 		print "Loading training data ..."
 		X_train, Y_train, X_test, Y_test = self.load_training_data(training_directory)
 		print "Initializing model"
-		self.model = model_class(n_categories=self.n_categories)
+		self.model = model_class(n_categories=self.n_categories, **kwargs)
 		print "Training model"
 		self.model.train(X_train, Y_train)
 		print "Evaluating model"
@@ -95,12 +108,13 @@ class Modeler(object):
 
 	def __call__(self, X):
 		Y = self.model.predict(X)
-		Y = from_categorical(Y)
+		# print Y
+		# Y = from_categorical(Y)
 		return [self.labels[y] for y in Y]
 
 	def evaluate(self, X_test, Y_test):
 	    predicted = self.model.predict(X_test)
-	    print predicted, predicted.shape
+	    print '\n', predicted, predicted.shape
 	    y = from_categorical(Y_test)
 	    print y, y.shape
 	    print classification_report(y, predicted, target_names=self.labels)
@@ -109,6 +123,8 @@ class Modeler(object):
 	    print "Accuracy:", acc
 
 if __name__ == "__main__":
-	mt = Modeler(model_class=SimpleLSTM)
+	print "Loading spaCy ..."
+	nlp = spacy.load('en')
+	mt = Modeler(model_class=SpacyLSTM, vocab=nlp.vocab, retrain=True)
 
 
