@@ -7,7 +7,7 @@ server = Flask(__name__)
 @server.route("/", methods=['POST'])
 def parse():
 	json_ = request.get_json(force=True)
-	log.info("Received JSON: ", json_)
+	print "Received JSON: ", json_
 	message = json_["message"]
 	res = intent_classifier(message, {})
 	return jsonify(res)

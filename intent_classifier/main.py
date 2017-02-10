@@ -17,12 +17,11 @@ class IntentClassifier(object):
         print "Loading spaCy ..."
         self.nlp = spacy.load('en')
         print "Loaded spaCy"
-        self.modeler = Modeler(SpacyLSTM, vocab=self.nlp.vocab)
+        self.modeler = Modeler(SpacyLSTM, vocab=self.nlp.vocab).load()
         self.history = []
         self.context = {}
 
     def __call__(self, message, context):
-        self.history.append(message)
         return self.parse_intent(message, context)
 
     def parse_intent(self, message, context):

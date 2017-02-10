@@ -1,10 +1,8 @@
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM
-from keras.layers.convolutional import Convolution1D
-from keras.layers.convolutional import MaxPooling1D
+from keras.layers import LSTM, Dropout, Dense
 from keras.layers.embeddings import Embedding
+from keras.layers.wrappers import TimeDistributed, Bidirectional
 from keras.preprocessing import sequence
 from keras.preprocessing.text import Tokenizer
 from keras.utils import np_utils
@@ -43,13 +41,13 @@ class SpacyLSTM(object):
 
     # Input: texts (strings), Y (categorical matrix)
     # Output: integer sequences of word IDs of fixed length
-    def train(self, X_raw, Y):
+    def train(self, X_raw, Y, **kwargs):
         print "Converting inputs ..."
         X = self.tokenizer(X_raw)
         print "Training shape: ", X.shape
         self.model = self.build_model()
         print "Fitting model ..."
-        self.model.fit(X, Y, batch_size=30, nb_epoch=1)
+        self.model.fit(X, Y, batch_size=30, **kwargs)
         
     def predict(self, X_raw):
         X = self.tokenizer(X_raw)
@@ -59,7 +57,7 @@ class SpacyLSTM(object):
         return self.predict(X)
 
     # create the model
-    def build_model(self):
+    def build_model(self, lstm_size=100, dropout=0.0):
         model = Sequential()
 
         # Build the initial Embedding layer based on spaCy weights
@@ -72,17 +70,14 @@ class SpacyLSTM(object):
             input_length=self.text_length,
             trainable=False))   # don't update the vectors - saves time
 
-        # Add a CNN layer with max pooling
-        model.add(Convolution1D(nb_filter=32, filter_length=3, border_mode='same', activation='relu'))
-        model.add(MaxPooling1D(pool_length=2))
-
         # Add the LSTM
-        model.add(LSTM(100))
+        model.add(Bidirectional(LSTM(lstm_size)))
+        model.add(Dropout(0.2))
 
         # Use a final Dense layer to reduce to n_categories outputs
-        model.add(Dense(self.n_categories, activation='sigmoid'))
+        model.add(Dense(self.n_categories, activation='softmax'))
         
-        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['categorical_accuracy'])
         return model
 
     def load(self, filename):
