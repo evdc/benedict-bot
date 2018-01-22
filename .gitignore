@@ -1,3 +1,5 @@
 *.h5
 **/*.h5
 *.pyc
+.DS_Store
+**/.DS_Store
