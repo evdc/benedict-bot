@@ -3,16 +3,16 @@ import requests
 
 server = Flask(__name__)
 
-VERIFY_TOKEN = ""
-PAGE_ACCESS_TOKEN = ""
+VERIFY_TOKEN = "Q1W2E3R4T5"
+PAGE_ACCESS_TOKEN = "EAAFr6jlzGY4BAHVGqfY4zZBrcij50MKph5leBhi0YAEy3OZBlZCsineDirk5ZBP2OXQWFSIyhRaGXPazTOX0r7bZBnpFm0DshoONWpgWZCTxNcZAU9t5eEWojnctlBypGpxVPdCjZAdpKuHvexNnuUOUeUZBf9n5n18tv4RsZCFj8PKAZDZD"
 
 @server.route("/", methods=['GET'])
 def verify():
 	"""Respond to status requests from Facebook."""
-	if request.params.get("hub.mode") == "subscribe" and requests.params.get("hub.challenge"):
-		if not request.params.get("hub.verify_token") == VERIFY_TOKEN:
+	if request.args.get("hub.mode") == "subscribe" and request.args.get("hub.challenge"):
+		if not request.args.get("hub.verify_token") == VERIFY_TOKEN:
 			return "Verification token mismatch", 403
-		return request.params["hub.challenge"], 200
+		return request.args["hub.challenge"], 200
 	return "Hello World", 200
 
 @server.route("/", methods=['POST'])
