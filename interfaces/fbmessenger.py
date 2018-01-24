@@ -1,5 +1,7 @@
 from flask import jsonify, make_response, request 
 from flask_restful import Resource
+import json
+import requests
 
 VERIFY_TOKEN = "Q1W2E3R4T5"
 PAGE_ACCESS_TOKEN = "EAAFr6jlzGY4BAHVGqfY4zZBrcij50MKph5leBhi0YAEy3OZBlZCsineDirk5ZBP2OXQWFSIyhRaGXPazTOX0r7bZBnpFm0DshoONWpgWZCTxNcZAU9t5eEWojnctlBypGpxVPdCjZAdpKuHvexNnuUOUeUZBf9n5n18tv4RsZCFj8PKAZDZD"
@@ -12,9 +14,9 @@ class FbMessengerWebhook(Resource):
 		"""Respond to status requests from Facebook."""
 		if request.args.get("hub.mode") == "subscribe" and request.args.get("hub.challenge"):
 			if not request.args.get("hub.verify_token") == VERIFY_TOKEN:
-				return "Verification token mismatch", 403
-			return request.args["hub.challenge"], 200
-		return "Hello World", 200
+				return make_response("Verification token mismatch", 403)
+			return make_response(request.args["hub.challenge"], 200)
+		return make_response("Hello World", 200)
 
 	def post(self):
 		data = request.get_json()
@@ -28,16 +30,7 @@ class FbMessengerWebhook(Resource):
 						message_text = messaging_event["message"]["text"]
 
 						# Respond
-						send_message(sender_id, "You just said {}.".format(message_text))
-
-					if messaging_event.get("delivery"):
-						pass	# delivery confirmation
-
-					if messaging_event.get("optin"):
-						pass
-
-					if messaging_event.get("postback"):
-						pass
+						send_message(sender_id, "You just said {}".format(message_text))
 
 		return "ok", 200
 
