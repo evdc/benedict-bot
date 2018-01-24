@@ -5,6 +5,9 @@ VERIFY_TOKEN = "Q1W2E3R4T5"
 PAGE_ACCESS_TOKEN = "EAAFr6jlzGY4BAHVGqfY4zZBrcij50MKph5leBhi0YAEy3OZBlZCsineDirk5ZBP2OXQWFSIyhRaGXPazTOX0r7bZBnpFm0DshoONWpgWZCTxNcZAU9t5eEWojnctlBypGpxVPdCjZAdpKuHvexNnuUOUeUZBf9n5n18tv4RsZCFj8PKAZDZD"
 
 class FbMessengerWebhook(Resource):
+	def __init__(self, **kwargs):
+		self.engine = kwargs['engine']
+
 	def get(self):
 		"""Respond to status requests from Facebook."""
 		if request.args.get("hub.mode") == "subscribe" and request.args.get("hub.challenge"):
