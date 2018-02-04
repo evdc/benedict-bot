@@ -6,6 +6,10 @@ import requests
 VERIFY_TOKEN = "Q1W2E3R4T5"
 PAGE_ACCESS_TOKEN = "EAAFr6jlzGY4BAHVGqfY4zZBrcij50MKph5leBhi0YAEy3OZBlZCsineDirk5ZBP2OXQWFSIyhRaGXPazTOX0r7bZBnpFm0DshoONWpgWZCTxNcZAU9t5eEWojnctlBypGpxVPdCjZAdpKuHvexNnuUOUeUZBf9n5n18tv4RsZCFj8PKAZDZD"
 
+GRAPH_URL = "https://graph.facebook.com/v2.6"
+
+DEBUG = True
+
 class FbMessengerWebhook(Resource):
 	def __init__(self, **kwargs):
 		self.engine = kwargs['engine']
@@ -30,12 +34,15 @@ class FbMessengerWebhook(Resource):
 						message_text = messaging_event["message"]["text"]
 
 						# Respond
-						send_message(sender_id, "You just said {}".format(message_text))
+						response = self.engine.handle_message(message_text)
+						if DEBUG:
+							return make_response({"response": response}, 200)
+						send_message(sender_id, response)
+						
 
 		return "ok", 200
 
 def send_message(recipient_id, message_text):
-	graph_url = "https://graph.facebook.com/v2.6"
 	params = {
 		"access_token": PAGE_ACCESS_TOKEN
 	}
@@ -48,6 +55,6 @@ def send_message(recipient_id, message_text):
 			"text": message_text
 		}
 	})
-	r = requests.post("{}/me/messages".format(graph_url), params=params, headers=headers, data=data)
+	r = requests.post("{}/me/messages".format(GRAPH_URL), params=params, headers=headers, data=data)
 	if r.status_code != 200:
 		print r.status_code, r.text

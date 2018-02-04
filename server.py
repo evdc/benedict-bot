@@ -2,11 +2,12 @@ from flask import Flask, request, jsonify
 from flask_restful import Api
 
 from interfaces.fbmessenger import FbMessengerWebhook
-
+from core import Engine
 
 def create_server(engine):
 	app = Flask(__name__)
 	api = Api()
+	engine = Engine()
 
 	api.add_resource(FbMessengerWebhook, "/fbmsg", 
 		resource_class_kwargs={'engine': engine})
