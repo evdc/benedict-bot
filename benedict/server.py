@@ -4,7 +4,7 @@ from flask_restful import Api
 from interfaces.fbmessenger import FbMessengerWebhook
 from core import Engine
 
-def create_server(engine):
+def create_server(env='Test'):
 	app = Flask(__name__)
 	api = Api()
 	engine = Engine()

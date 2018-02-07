@@ -8,7 +8,7 @@ PAGE_ACCESS_TOKEN = "EAAFr6jlzGY4BAHVGqfY4zZBrcij50MKph5leBhi0YAEy3OZBlZCsineDir
 
 GRAPH_URL = "https://graph.facebook.com/v2.6"
 
-DEBUG = True
+DEBUG = False
 
 class FbMessengerWebhook(Resource):
 	def __init__(self, **kwargs):
