@@ -8,11 +8,10 @@ PAGE_ACCESS_TOKEN = "EAAFr6jlzGY4BAHVGqfY4zZBrcij50MKph5leBhi0YAEy3OZBlZCsineDir
 
 GRAPH_URL = "https://graph.facebook.com/v2.6"
 
-DEBUG = False
-
 class FbMessengerWebhook(Resource):
 	def __init__(self, **kwargs):
 		self.engine = kwargs['engine']
+		self.debug = True
 
 	def get(self):
 		"""Respond to status requests from Facebook."""
@@ -35,8 +34,8 @@ class FbMessengerWebhook(Resource):
 
 						# Respond
 						response = self.engine.handle_message(message_text)
-						if DEBUG:
-							return make_response({"response": response}, 200)
+						if self.debug:
+							return {"response": response}, 200
 						send_message(sender_id, response)
 						
 
