@@ -1,1 +1,1 @@
-web: gunicorn server:server --log-file=-
+web: gunicorn run:app --log-file=-

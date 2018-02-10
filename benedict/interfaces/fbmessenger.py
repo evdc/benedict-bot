@@ -11,7 +11,7 @@ GRAPH_URL = "https://graph.facebook.com/v2.6"
 class FbMessengerWebhook(Resource):
 	def __init__(self, **kwargs):
 		self.engine = kwargs['engine']
-		self.debug = True
+		self.debug = False
 
 	def get(self):
 		"""Respond to status requests from Facebook."""
