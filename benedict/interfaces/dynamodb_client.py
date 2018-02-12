@@ -8,7 +8,8 @@ from benedict.utils import totimestamp
 class DynamoDBBackend(object):
 	"""Responsible for storing user messages and other data in DynamoDB."""
 	def __init__(self):
-		self.table = bt.resource('dynamodb').Table('benedict_messages')
+		self.resource = bt.resource('dynamodb', region_name='us-east-1')
+		self.table - self.resource.Table('benedict_messages')
 
 	def save_message(self, message):
 		# message expected as dict with keys user, text

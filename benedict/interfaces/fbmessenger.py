@@ -23,7 +23,6 @@ class FbMessengerWebhook(Resource):
 
 	def post(self):
 		data = request.get_json()
-		print "Received JSON:", data
 		if data["object"] == "page":
 			for entry in data["entry"]:
 				for messaging_event in entry["messaging"]:
@@ -58,5 +57,3 @@ def send_message(recipient_id, message_text):
 		}
 	})
 	r = requests.post("{}/me/messages".format(GRAPH_URL), params=params, headers=headers, data=data)
-	if r.status_code != 200:
-		print r.status_code, r.text
