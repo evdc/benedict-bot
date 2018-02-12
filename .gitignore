@@ -6,4 +6,5 @@
 **/.DS_Store
 .cache
 **/.cache
+.pytest_cache/
 venv/
