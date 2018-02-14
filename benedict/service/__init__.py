@@ -9,10 +9,10 @@ def create_app(env='Test'):
 	api = Api()
 	engine = Engine()
 
-	debug = (env == 'Test')
+	app.config.from_object('benedict.config.{}Config'.format(env))
 
 	api.add_resource(FbMessengerWebhook, "/fbmsg", 
-		resource_class_kwargs={'engine': engine, 'debug': debug})
+		resource_class_kwargs={'engine': engine, 'debug': app.config['DEBUG']})
 
 	api.init_app(app)
 

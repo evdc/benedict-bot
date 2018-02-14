@@ -1,3 +1,3 @@
 ## Benedict Lives!
 
-`python server.py &`
+`python run.py &`
