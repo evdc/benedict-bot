@@ -4,6 +4,7 @@ from flask_restful import Api
 from benedict.interfaces.fbmessenger import FbMessengerWebhook
 from benedict.core.engine import Engine
 
+
 def create_app(env='Test'):
 	app = Flask(__name__)
 	api = Api()
