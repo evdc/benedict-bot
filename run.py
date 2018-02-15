@@ -1,10 +1,12 @@
 import os
 
-from benedict.service import create_app
+from benedict.service import create_app, setup_celery
 
 
 env = os.environ.get("FLASK_ENV", "Test")
-app = create_app(env=env)
+server = create_app(env=env)
+
+celery = setup_celery(server)
 
 if __name__ == "__main__":
-	app.run()
+	server.run()
