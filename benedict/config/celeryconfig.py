@@ -1,6 +1,7 @@
+import os
 from celery.schedules import crontab
 
-CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_BROKER_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
 CELERY_IMPORTS = ('benedict.tasks.push_message_task')
 CELERY_TASK_RESULT_EXPIRES = 30
