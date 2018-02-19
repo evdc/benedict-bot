@@ -20,19 +20,19 @@ def create_app(env='Test'):
 
 	return app
 
-def setup_celery(app):
-    celery = Celery(app.import_name, broker=app.config['CELERY_BROKER_URL'])
-    celery.config_from_object('benedict.config.celeryconfig')
-    celery.conf.update(app.config)
-    TaskBase = celery.Task
+# def setup_celery():
+#     celery = Celery(__file__)
+#     celery.config_from_object('benedict.config.celeryconfig')
+#     # celery.conf.update(app.config)
+#     # TaskBase = celery.Task
 
-    class ContextTask(TaskBase):
-        abstract = True
+#     # class ContextTask(TaskBase):
+#     #     abstract = True
 
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
+#     #     def __call__(self, *args, **kwargs):
+#     #         with app.app_context():
+#     #             return TaskBase.__call__(self, *args, **kwargs)
 
-    celery.Task = ContextTask
+#     # celery.Task = ContextTask
 
-    return celery
+#     return celery

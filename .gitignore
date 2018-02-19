@@ -8,4 +8,5 @@
 **/.cache
 .pytest_cache/
 venv/
-celerybeat-schedule
+celerybeat*
+*.pid
