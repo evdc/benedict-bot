@@ -10,3 +10,5 @@
 venv/
 celerybeat*
 *.pid
+.idea/
+.idea/*
