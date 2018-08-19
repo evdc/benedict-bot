@@ -1,15 +1,19 @@
-app:
-    build: .
-    environment:
-        - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY
-        - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
-    ports:
-        - "5000:5000"
-    links:
-        - redis
+version: '3'
 
-redis:
-    image: "redis"
-    ports:
-        - "6379:6379"
-    restart: always
+services:
+  redis_server:
+      image: "redis"
+      ports:
+          - "6379:6379"
+      restart: always
+
+  benny:
+      build: .
+      environment:
+          - AWS_ACCESS_KEY_ID=$AWSAccessKeyId
+          - AWS_SECRET_ACCESS_KEY=$AWSSecretKey
+      ports:
+          - "5000:5000"
+      depends_on:
+        - redis_server
+
