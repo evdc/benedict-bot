@@ -51,3 +51,4 @@ def test_fbmsg_post(client):
     response = client.post("/fbmsg", data=json.dumps(data), content_type="application/json")
     assert response.status_code == 200
     assert json.loads(response.get_data(as_text=True)) == {'response': 'Hello from Benedict!'}
+

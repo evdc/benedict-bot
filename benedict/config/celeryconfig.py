@@ -6,7 +6,7 @@ BROKER_URL = CELERY_BROKER_URL
 REDBEAT_REDIS_URL = CELERY_BROKER_URL
 redbeat_redis_url = CELERY_BROKER_URL
 
-CELERY_IMPORTS = ('benedict.tasks.push_message_task')
+CELERY_IMPORTS = ('benedict.core.tasks')
 CELERY_TASK_RESULT_EXPIRES = 30
 CELERY_TIMEZONE = 'UTC'
 
