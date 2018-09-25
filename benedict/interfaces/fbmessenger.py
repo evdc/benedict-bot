@@ -57,4 +57,5 @@ def send_message(recipient_id, message_text):
             "text": message_text
         }
     })
+    print("SENDING MESSAGE {} to {}".format(message_text, recipient_id))
     r = requests.post("{}/me/messages".format(GRAPH_URL), params=params, headers=headers, data=data)
