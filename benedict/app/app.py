@@ -4,8 +4,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 from flask.ext.heroku import Heroku
 from app.db import DB
 from app.models import User
-from app.models import Response as UserResponse
-from app.models import seed_test_data
+from app.models import Message as UserMessage
 from app.sms import send_message
 import os
 
@@ -75,12 +74,12 @@ def create_app(env="Development"):
             if user:
                 message = body.lower()
 
-                response = UserResponse(
+                msg_object = UserMessage(
                     user_id=user.id,
                     raw=body.lower(),
                     happiness=score
                 )
-                DB.session.add(response)
+                DB.session.add(msg_object)
                 DB.session.commit()
 
                 resp.message("Thanks for sharing. Your response has been recorded.".format(response_text))
