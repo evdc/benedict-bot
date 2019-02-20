@@ -1,12 +1,15 @@
+import os
+
 from flask import Flask, redirect, request, \
     Response, render_template
 from twilio.twiml.messaging_response import MessagingResponse
 from flask.ext.heroku import Heroku
-from app.db import DB
-from app.models import User
-from app.models import Message as UserMessage
-from app.sms import send_message
-import os
+
+from benedict.app.db import DB
+from benedict.app.models import User
+from benedict.app.models import Message as UserMessage
+from benedict.app.sms import send_message
+
 
 
 def create_app(env="Development"):

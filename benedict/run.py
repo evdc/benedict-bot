@@ -1,5 +1,5 @@
 import os
-from app.app import create_app
+from benedict.app.app import create_app
 
 env = os.environ.get("FLASK_ENV", "Development")
 APP = create_app(env)
