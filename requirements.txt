@@ -1,3 +1,4 @@
+apscheduler==3.5.3
 Click==7.0
 Flask==0.12.4
 Flask-Heroku==0.1.9
