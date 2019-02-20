@@ -9,7 +9,7 @@ from benedict.app.db import DB
 from benedict.app.models import User
 from benedict.app.models import Message as UserMessage
 from benedict.app.sms import send_message
-
+from benedict.app.utils import normalize_number
 
 
 def create_app(env="Development"):
