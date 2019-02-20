@@ -42,59 +42,61 @@ def create_app(env="Development"):
 
     @app.route("/message", methods=["GET", "POST"])
     def handle_response():
-        # See: https://www.twilio.com/docs/sms/tutorials/how-to-receive-and-reply-python
-        # Webhook for the user texting us / twilio hits this
         print("Request values", request.values)
-        body = request.values.get('Body', None)
+        body = request.values.get('Body', '')
         phone_number = request.values.get('From')
         phone_number = normalize_number(phone_number)
 
         resp = MessagingResponse()
-
+        response_msg = ''
         if body.lower() == 'confirm':
-            print("Looking for user with phone number {}".format(phone_number))
-            user = DB.session.query(User).filter(
-                User.phone_number == phone_number,
-                User.confirmed == False
-            ).one_or_none()
-            print("query result: {}".format(user))
-
-            if user:
-                user.confirmed = True
-                DB.session.add(user)
-                DB.session.commit()
-                resp.message("Thank you! Your path to happiness begins NOW!")
-                return str(resp)
-            else:
-                return ''
-
+            response_msg = handle_confirm(phone_number)
         else:
-            # check if user confirmed
-            # if so do the regular response flow: store in db, thank the user
-            user = DB.session.query(User).filter(
-                User.phone_number == phone_number,
-                User.confirmed == True
-            ).one_or_none()
-            print("found user: {}".format(user))
-            if user:
-                message = body.lower()
-
-                msg_object = UserMessage(
-                    user_id=user.id,
-                    raw=body.lower(),
-                    happiness=score
-                )
-                DB.session.add(msg_object)
-                DB.session.commit()
-
-                resp.message("Thanks for sharing. Your response has been recorded.".format(response_text))
-            else:
-                resp.message("Please sign up and confirm first.")
-            return str(resp)
+            response_msg = handle_regular_response(phone_number, body)
+        resp.message(response_msg)
+        return str(resp)
 
     DB.init_app(app)
-
     return app
+
+
+def handle_confirm(phone_number):
+    print("Looking for user with phone number {}".format(phone_number))
+    user = DB.session.query(User).filter(
+        User.phone_number == phone_number,
+        User.confirmed == False
+    ).one_or_none()
+    print("query result: {}".format(user))
+
+    if user:
+        user.confirmed = True
+        DB.session.add(user)
+        DB.session.commit()
+        return "Thanks! You're now confirmed."
+    else:
+        return "Please sign up first: https://benedict-bot.herokuapp.com"
+
+
+def handle_regular_response(phone_number, body):
+    user = DB.session.query(User).filter(
+        User.phone_number == phone_number,
+        User.confirmed == True
+    ).one_or_none()
+    print("found user: {}".format(user))
+    if user:
+        message = body.lower()
+
+        msg_object = UserMessage(
+            user_id=user.id,
+            raw=body.lower()
+        )
+        DB.session.add(msg_object)
+        DB.session.commit()
+
+        return "Thanks for sharing. Your response has been recorded."
+    else:
+        return "Please sign up and confirm first: https://benedict-bot.herokuapp.com"
+
 
 if __name__ == "__main__":
     create_app()
