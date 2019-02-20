@@ -11,16 +11,18 @@ from benedict.app.models import Message as UserMessage
 from benedict.app.sms import send_message
 from benedict.app.utils import normalize_number
 
+def get_db_url(env):
+    if env == "Development":
+        return os.environ.get("SQLALCHEMY_DATABASE_URI") or "postgresql:///benedict"
+    else:
+        return os.environ['DATABASE_URL']
 
 def create_app(env="Development"):
     app = Flask(__name__, static_url_path="/static")
 
     heroku = Heroku(app)
 
-    if env == "Development":
-        app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///benedict"
-    else:
-        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['DATABASE_URL']
+    app.config["SQLALCHEMY_DATABASE_URI"] = get_db_url(env)
 
     @app.route("/")
     def index():
