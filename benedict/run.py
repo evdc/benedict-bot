@@ -9,8 +9,8 @@ APP = create_app(env)
 from apscheduler.schedulers.background import BackgroundScheduler
 scheduler = BackgroundScheduler()
 scheduler.add_jobstore('sqlalchemy', url=APP.config["SQLALCHEMY_DATABASE_URI"])
-job = scheduler.add_job(ping, 'interval', minutes=2, args=['18052848446'])
 scheduler.start()
+job = scheduler.add_job(ping, 'interval', minutes=2, args=['18052848446'], id='ping')
 
 if __name__ == "__main__":
     from wsgiref.simple_server import make_server
