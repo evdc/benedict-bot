@@ -5,7 +5,6 @@ from flask import Flask, redirect, request, \
     Response, render_template
 from twilio.twiml.messaging_response import MessagingResponse
 from flask.ext.heroku import Heroku
-from apscheduler.schedulers.background import BackgroundScheduler
 
 from benedict.app.db import DB
 from benedict.app.models import User
@@ -19,22 +18,12 @@ def get_db_url(env):
     else:
         return os.environ['DATABASE_URL']
 
-def ping(number):
-    m = "Hello from Benedict! It is {}".format(datetime.now())
-    print("Pinging {}".format(number))
-    send_message(m, number)
-
 
 def create_app(env="Development"):
     app = Flask(__name__, static_url_path="/static")
     app.config["SQLALCHEMY_DATABASE_URI"] = get_db_url(env)
 
     heroku = Heroku(app)
-
-    scheduler = BackgroundScheduler()
-    scheduler.add_jobstore('sqlalchemy', url=app.config["SQLALCHEMY_DATABASE_URI"])
-    job = scheduler.add_job(ping, 'interval', minutes=2, args=['18052848446'])
-    scheduler.start()
 
     @app.route("/")
     def index():
