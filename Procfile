@@ -1,1 +1,1 @@
-web: gunicorn benedict.run:APP
+web: gunicorn benedict.run:APP --preload

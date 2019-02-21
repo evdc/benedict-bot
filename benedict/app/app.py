@@ -12,6 +12,10 @@ from benedict.app.models import Message as UserMessage
 from benedict.app.sms import send_message
 from benedict.app.utils import normalize_number
 
+from benedict.app.tasks import ping
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.base import ConflictingIdError
+
 def get_db_url(env):
     if env == "Development":
         return os.environ.get("SQLALCHEMY_DATABASE_URI") or "postgresql:///benedict"
@@ -24,6 +28,15 @@ def create_app(env="Development"):
     app.config["SQLALCHEMY_DATABASE_URI"] = get_db_url(env)
 
     heroku = Heroku(app)
+
+    scheduler = BackgroundScheduler()
+    scheduler.add_jobstore('sqlalchemy', url=app.config["SQLALCHEMY_DATABASE_URI"])
+    scheduler.add_job(ping, 'interval', minutes=2, args=['18052848446'])
+    scheduler.start()
+    # try:
+    #     scheduler.add_job(ping, 'interval', minutes=2, args=['18052848446'], id='ping')
+    # except ConflictingIdError:
+    #     pass
 
     @app.route("/")
     def index():

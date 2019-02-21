@@ -1,5 +1,8 @@
 from datetime import datetime
+import os
+
 from benedict.app.sms import send_message
+
 
 def ping(number):
     m = "Hello from Benedict! It is {}".format(datetime.now())
