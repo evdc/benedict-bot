@@ -30,7 +30,7 @@ def create_app(env="Development"):
     heroku = Heroku(app)
 
     print("Starting the scheduler in PID {}".format(os.getpid()))
-    scheduler = BackgroundScheduler()
+    scheduler = BackgroundScheduler(job_defaults={'coalesce': True})
     scheduler.add_jobstore('sqlalchemy', url=app.config["SQLALCHEMY_DATABASE_URI"])
     scheduler.add_job(ping, 'interval', minutes=2, args=['18052848446'])
     scheduler.start()
