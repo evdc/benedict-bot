@@ -1,7 +1,8 @@
 import os
+
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from benedict.app.tasks import send_reminder
+from benedict.brain.tasks import send_reminder
 from benedict.config import get_db_url
 
 

@@ -1,6 +1,6 @@
 import os
 
-from benedict.app.sms import send_message
+from benedict.interfaces.sms import send_message
 
 
 def send_reminder(number, name, message):
