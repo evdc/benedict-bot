@@ -1,10 +1,7 @@
-import os
-from datetime import datetime
-
 from flask import Flask, redirect, request, \
     Response, render_template
-from twilio.twiml.messaging_response import MessagingResponse
 from flask.ext.heroku import Heroku
+from twilio.twiml.messaging_response import MessagingResponse
 
 from benedict.app.db import DB
 from benedict.app.models import User
@@ -12,15 +9,8 @@ from benedict.app.models import Message as UserMessage
 from benedict.app.sms import send_message
 from benedict.app.utils import normalize_number
 
-from benedict.app.tasks import ping
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.jobstores.base import ConflictingIdError
-
-def get_db_url(env):
-    if env == "Development":
-        return os.environ.get("SQLALCHEMY_DATABASE_URI") or "postgresql:///benedict"
-    else:
-        return os.environ['DATABASE_URL']
+from benedict.brain.handler import get_response
+from benedict.config import get_db_url
 
 
 def create_app(env="Development"):
@@ -28,16 +18,6 @@ def create_app(env="Development"):
     app.config["SQLALCHEMY_DATABASE_URI"] = get_db_url(env)
 
     heroku = Heroku(app)
-
-    print("Starting the scheduler in PID {}".format(os.getpid()))
-    scheduler = BackgroundScheduler(job_defaults={'coalesce': True})
-    scheduler.add_jobstore('sqlalchemy', url=app.config["SQLALCHEMY_DATABASE_URI"])
-    scheduler.add_job(ping, 'interval', minutes=2, args=['18052848446'])
-    scheduler.start()
-    # try:
-    #     scheduler.add_job(ping, 'interval', minutes=2, args=['18052848446'], id='ping')
-    # except ConflictingIdError:
-    #     pass
 
     @app.route("/")
     def index():
@@ -97,18 +77,19 @@ def handle_regular_response(phone_number, body):
         User.phone_number == phone_number,
         User.confirmed == True
     ).one_or_none()
-    print("found user: {}".format(user))
     if user:
         message = body.lower()
 
         msg_object = UserMessage(
             user_id=user.id,
-            raw=body.lower()
+            raw=message
         )
         DB.session.add(msg_object)
         DB.session.commit()
 
-        return "Thanks for sharing. Your response has been recorded."
+        response = get_response(user, message)
+
+        return response
     else:
         return "Please sign up and confirm first: https://benedict-bot.herokuapp.com"
 

@@ -11,6 +11,7 @@ class User(DB.Model):
 
     id = DB.Column(DB.Integer, primary_key=True)
     phone_number = DB.Column(DB.Text, nullable=False, unique=True)
+    name = DB.Column(DB.Text, nullable=True)
     confirmed = DB.Column(DB.Boolean, nullable=False, default=False)
     last_active = DB.Column(DB.DateTime)
 
